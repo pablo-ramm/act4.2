@@ -28,12 +28,14 @@ class Graph {
     void printAdjDirList();
     void printAdjMatrix();
 
+
   
   public:
     Graph(int representacion, std::istream& input);
     ~Graph();
     void printGraph();
     void BFS(int v);
+    void dijkstra();
 
 
 };

@@ -120,7 +120,7 @@
         index++;
         p = p->next;
       }
-      return -1;
+      return T();
     }
   }
 

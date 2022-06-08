@@ -7,6 +7,7 @@ GraphNode::GraphNode(){
 GraphNode::GraphNode(int numberNode_, int weight_){
     numberNode = numberNode_;
     weight = weight_;
+    minDistance = 0;
 }
 
 int GraphNode::getWeight(){
@@ -15,4 +16,12 @@ int GraphNode::getWeight(){
 
 int GraphNode::getNumberNode(){
     return numberNode;
+}
+
+int GraphNode::getMinDistance(){
+    return minDistance;
+}
+
+void GraphNode::setMinDistance(int minD){
+    minDistance = minD;
 }

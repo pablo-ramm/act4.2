@@ -1,5 +1,6 @@
 #include "Graph.h"
 #include "GraphNode.h"
+#include "MinHeap.h"
 
 Graph::Graph(int representa, std::istream &input)
 {
@@ -143,8 +144,9 @@ void Graph::printAdjMatrix()
     }
 }
 
-void Graph::printAdjDirList(){
-   std::cout << "Adjacency List" << std::endl;
+void Graph::printAdjDirList()
+{
+    std::cout << "Adjacency List" << std::endl;
     for (int i = 1; i <= numNodes; i++)
     {
         std::cout << "vertex " << i << ": ";
@@ -154,13 +156,16 @@ void Graph::printAdjDirList(){
 
 void Graph::printGraph()
 {
-    if (representation == 1){
+    if (representation == 1)
+    {
         printAdjList();
     }
-    else if (representation == 2){
+    else if (representation == 2)
+    {
         printAdjMatrix();
     }
-    else{
+    else
+    {
         printAdjDirList();
     }
 }
@@ -260,43 +265,62 @@ void Graph::loadDirectedGraph(std::istream &input)
     }
 }
 
-// void Graph::loadGraphList2(std::istream &input)
-// {
-//     std::string line;
-//     int i = 0;
-//     while (std::getline(input, line))
-//     {
-//         if (i == 0)
-//         {
-//             i++;
-//             continue;
-//         }
-//         if (i == 1)
-//         {
-//             std::vector<int> res;
-//             split(line, res);
-//             numNodes = res[0];
-//             numEdges = res[2];
-//             // Reservar memoria para los renglones de la lista de adyacencia (renglon 0 no utilizado)
-//             adjList.resize(numNodes + 1);
-//             // Declara una lista vacia para cada renglon y la almacena en el vector
-//             for (int k = 1; k <= numNodes; k++)
-//             {
-//                 LinkedList<GraphNode> tmpList;
-//                 adjDirList[k] = tmpList;
-//             }
-//             i++;
-//             continue;
-//         }
-//         std::vector<int> res;
-//         split(line, res);
-//         int u = res[0];
-//         int v = res[1];
-//         int weight = res[2];
-//         GraphNode node(v, weight);
-//         std::cout << "weight: " << node.getWeight() << "and to node: " << node.getNumberNode() << std::endl;
-//         // Grafos no dirigidos agrega aristas (u,v) y (v,u)
-//         adjList[u].addLast(node);
-//         i++;
-//     }
-// }
+void Graph::dijkstra()
+{
+    
+    MinHeap<GraphNode> minh(numNodes+1);
+    int v = 1;
+    std::vector<GraphNode> processNodes;
+    processNodes.resize(numNodes+1);
+
+//inicializamos por insertar el nodo raiz 0 con una distancia minima de cero en el minheap
+    GraphNode node(v, 0);
+    node.setMinDistance(0);
+    minh.push(node);
+
+//insertamos los demas nodos con el valor maximo que puedan tener
+    for(int i = 2; i<numNodes; i++){
+        GraphNode node(i, 0);
+        node.setMinDistance(std::numeric_limits<int>::max());
+        minh.push(node);
+    }
+
+    minh.printMinHeap();
+    
+    
+    while (!minh.isEmpty())
+    {
+        // Extraemos el vertice con la menor distancia del min heap
+        v = minh.top().getNumberNode();
+        std::cout << "Nodo extraido: " << v << std::endl;
+        //Actualizamos las distancias entre los nodos adjacientes de v
+        for (int j = 0; j < (int)adjDirList[v].getNumElements(); j++)
+        {
+            int u = adjDirList[v].getData(j).getNumberNode();
+            
+
+            //si el nodo adyacente u de v se encuentra en el minheap, lo procesamos
+            if (minh.isInMinHeap(u))
+            {
+                //si la distancia actual de v a u mas el peso de u es menor a la actual distancia del nodo dentro el minheap la actualizamos
+                if(minh.top().getMinDistance()+adjDirList[v].getData(j).getWeight() < minh.getMinDistance(u)){
+                    minh.updateMinDistance(u, minh.top().getMinDistance()+adjDirList[v].getData(j).getWeight());
+                    std::cout << "Update min distance of: " << u << " for: "<< minh.getMinDistance(u) << std::endl;
+                }
+               
+            }
+        }
+
+        std::cout << "top before pop: " << minh.top().getNumberNode() << std::endl;
+        processNodes[v].setMinDistance(minh.top().getMinDistance());
+        std::cout << "top " << minh.top().getMinDistance() << std::endl;
+        minh.pop();
+       
+    }
+        std::cout << "Dijkstra\n"; 
+        std::cout << "vertex\t \t Distance from source\n";
+        for(int i = 1; i<numNodes; i++){
+            std::cout << i << "\t\t" << processNodes[i].getMinDistance() << std::endl;
+        }
+    
+}
